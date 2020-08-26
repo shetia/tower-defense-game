@@ -1,7 +1,7 @@
-var _TD = {
-	a: [],
+let _TD = {
+	a: [],  // 数组
 	retina: window.devicePixelRatio || 1, // 视网膜 设备像素比
-	init: function(t, i) {
+	init: function(t, i) {  // 初始化
 		delete this.init
 		let s = {
 			version: "0.1.18",
@@ -9,19 +9,19 @@ var _TD = {
 			is_paused: !0,
 			width: 16,
 			height: 16,
-			show_monster_life: !0,
+			show_monster_life: !0, // 显示怪兽生命力
 			fps: 0,   // 每秒帧数
-			exp_fps: 24,
-			exp_fps_half: 12,
-			exp_fps_quarter: 6,
-			exp_fps_eighth: 4,
-			stage_data: {},
+			exp_fps: 24,   // 经验帧数
+			exp_fps_half: 12, // 一半经验
+			exp_fps_quarter: 6, // 四分之一经验
+			exp_fps_eighth: 4, // 八分之一经验
+			stage_data: {},  // 舞台数据
 			defaultSettings: function() {   // 默认设置
 				return {
-					step_time: 36,
-					grid_size: 32 * _TD.retina,
-					padding: 10 * _TD.retina,
-					global_speed: .1
+					step_time: 36,  // 步数时长
+					grid_size: 32 * _TD.retina, // 网格尺寸
+					padding: 10 * _TD.retina,  // padding大小
+					global_speed: .1  // 全局速度
 				}
 			},
 			init: function(t) {  // 初始化
@@ -63,22 +63,22 @@ var _TD = {
         this.step()
         return this
 			},
-			checkCheat: function(t) {
+			checkCheat: function(t) { // 检查 作弊
 				switch (t) {
 				case "money+":
-					this.money += 1e6, this.log("cheat success!");
+					this.money += 1e6, this.log("作弊 success!");
 					break;
 				case "life+":
-					this.life = 100, this.log("cheat success!");
+					this.life = 100, this.log("作弊 success!");
 					break;
 				case "life-":
-					this.life = 1, this.log("cheat success!");
+					this.life = 1, this.log("作弊 success!");
 					break;
 				case "difficulty+":
-					this.difficulty *= 2, this.log("cheat success! difficulty = " + this.difficulty);
+					this.difficulty *= 2, this.log("作弊 success! 难度 = " + this.difficulty);
 					break;
 				case "difficulty-":
-					this.difficulty /= 2, this.log("cheat success! difficulty = " + this.difficulty)
+					this.difficulty /= 2, this.log("作弊 success! 难度 = " + this.difficulty)
 				}
 			},
 			step: function() { // 步
@@ -126,7 +126,8 @@ var _TD = {
 			gc: function() {  // 垃圾回收
 				window.CollectGarbage && (CollectGarbage(), requestAnimationFrame(CollectGarbage))
 			}
-		};
+    };
+    // 执行a数组中的函数
 		let e = 0
 		while(this.a[e]){
 			this.a[e++](s)
@@ -135,12 +136,15 @@ var _TD = {
 		s.init(t)
 	}
 };
-_TD.a.push(function(t) {
+
+
+// 1. lang工具方法 lang
+let lang = function(t) {
 	t.lang = {
-		$e: function(t) {
+		$e: function(t) {  // 根据id获取dom
 			return document.getElementById(t)
 		},
-		$c: function(t, i, e) {
+		$c: function(t, i, e) { // 创建元素 设置属性
 			var s = document.createElement(t);
 			i = i || {};
 			for (var n in i) i.hasOwnProperty(n) && s.setAttribute(n, i[n]);
@@ -220,8 +224,9 @@ _TD.a.push(function(t) {
 			return t
 		}
 	}
-});
- _TD.a.push(function(t) {
+}
+// 2, 事件管理器 eventManager
+let eventManager = function(t) {
 	t.eventManager = {
 		ex: -1,
 		ey: -1,
@@ -262,8 +267,9 @@ _TD.a.push(function(t) {
 			this.current_type = "click", this.ex = t, this.ey = i
 		}
 	}
-});
- _TD.a.push(function(t) {
+}
+// 3. 舞台 Stage
+let Stage = function(t) {
 	t.Stage = function(i, e) {
 		this.id = i || "stage-" + t.lang.rndStr(), this.cfg = e || {}, this.width = this.cfg.width || 640, this.height = this.cfg.height || 540, this.mode = "normal", this.state = 0, this.acts = [], this.current_act = null, this._step2 = t.lang.nullFunc, this._init()
 	}, t.Stage.prototype = {
@@ -299,8 +305,9 @@ _TD.a.push(function(t) {
 			this.current_act && this.current_act.addElement(t, i, e)
 		}
 	}
-});
- _TD.a.push(function(t) {
+}
+/// 4. 动作, 开始暂停,重新开始 Act
+let Act = function(t) {
 	t.Act = function(i, e) {
 		this.stage = i, this.id = e || "act-" + t.lang.rndStr(), this.state = 0, this.scenes = [], this.end_queue = [], this.current_scene = null, this._init()
 	}, t.Act.prototype = {
@@ -344,8 +351,9 @@ _TD.a.push(function(t) {
 			this.current_scene.gameover()
 		}
 	}
-});
- _TD.a.push(function(t) {
+}
+// 5. 场景 Scene
+let Scene = function(t) {
 	t.Scene = function(i, e) {
 		this.act = i, this.stage = i.stage, this.is_gameover = !1, this.id = e || "scene-" + t.lang.rndStr(), this.state = 0, this.end_queue = [], this._step_elements = [
 			[],
@@ -427,8 +435,9 @@ _TD.a.push(function(t) {
 			i = i || t.step_level || 1, e = e || t.render_level, this._step_elements[i].push(t), this._render_elements[e].push(t), t.scene = this, t.step_level = i, t.render_level = e
 		}
 	}
-});
- _TD.a.push(function(t) {
+}
+ // 6. 元素 Element
+ let Element = function(t) {
 	t.Element = function(i, e) {
 		this.id = i || "el-" + t.lang.rndStr(), this.cfg = e || {}, this.is_valid = !0, this.is_visiable = "undefined" != typeof e.is_visiable ? e.is_visiable : !0, this.is_paused = !1, this.is_hover = !1, this.x = this.cfg.x || -1, this.y = this.cfg.y || -1, this.width = this.cfg.width || 0, this.height = this.cfg.height || 0, this.step_level = e.step_level || 1, this.render_level = e.render_level, this.on_events = e.on_events || [], this._init()
 	}, t.Element.prototype = {
@@ -490,8 +499,10 @@ _TD.a.push(function(t) {
 			}), i.addElement(this, e, s))
 		}
 	}
-});
- _TD.a.push(function(t) {
+}
+
+// 7. 地图 Map
+let Map = function(t) {
 	function i(i, e) {
 		var s = new t.Element(i, e);
 		return t.lang.mix(s, h), s._init(e), s
@@ -626,8 +637,9 @@ _TD.a.push(function(t) {
 			i.fillStyle = "#fff", i.beginPath(), i.fillRect(0, 0, this.x1, this.h), i.fillRect(0, 0, this.w, this.y1), i.fillRect(0, this.y2, this.w, this.h2), i.fillRect(this.x2, 0, this.w2, this.h), i.closePath(), i.fill()
 		}
 	}
-});
- _TD.a.push(function(t) {
+}
+// 8 购买 移除建筑 Grid
+let Grid = function(t) {
 	var i = {
 		_init: function(i) {
 			i = i || {}, this.map = i.map, this.scene = this.map.scene, this.mx = i.mx, this.my = i.my, this.width = t.grid_size, this.height = t.grid_size, this.is_entrance = this.is_exit = !1, this.passable_flag = 1, this.build_flag = 1, this.building = null, this.caculatePos()
@@ -692,8 +704,9 @@ _TD.a.push(function(t) {
 		var n = new t.Element(e, s);
 		return t.lang.mix(n, i), n._init(s), n
 	}
-});
- _TD.a.push(function(t) {
+}
+// 9 建筑和炮弹 Building Bullet
+let Building = function(t) {
 	var i = {
 		_init: function(i) {
 			this.is_selected = !1, this.level = 0, this.killed = 0, this.target = null, i = i || {}, this.map = i.map || null, this.grid = i.grid || null, this.bullet_type = i.bullet_type || 1, this.type = i.type, this.speed = i.speed, this.bullet_speed = i.bullet_speed, this.is_pre_building = !! i.is_pre_building, this.blink = this.is_pre_building, this.wait_blink = this._default_wait_blink = 20, this.is_weapon = "wall" != this.type;
@@ -852,8 +865,10 @@ _TD.a.push(function(t) {
 		var n = new t.Element(i, s);
 		return t.lang.mix(n, e), n._init(s), n
 	}
-});
-_TD.a.push(function(t) {
+}
+
+// 10 攻击   Explode爆炸
+let Explode = function(t) {
 	var i = {
 		_init: function(i) {
 			i = i || {}, this.is_monster = !0, this.idx = i.idx || 1, this.difficulty = i.difficulty || 1;
@@ -938,7 +953,7 @@ _TD.a.push(function(t) {
 		},
 		onOut: function() {}
 	};
-	t.Monster = function(e, s) {
+	t.Monster = function(e, s) {  //怪物
 		s.on_events = ["enter", "out"];
 		var n = new t.Element(e, s);
 		return t.lang.mix(n, i), n._init(s), n
@@ -957,12 +972,13 @@ _TD.a.push(function(t) {
 			i.fillStyle = "rgba(" + this.rgb_r + "," + this.rgb_g + "," + this.rgb_b + "," + this.rgb_a + ")", i.beginPath(), i.arc(this.cx, this.cy, this.r, 0, 2 * Math.PI, !0), i.closePath(), i.fill()
 		}
 	};
-	t.Explode = function(i, s) {
+	t.Explode = function(i, s) {  // 爆炸
 		var n = new t.Element(i, s);
 		return t.lang.mix(n, e), n._init(s), n
 	}
-});
- _TD.a.push(function(t) {
+}
+// 11各种鼠标事件方法 Panel
+let Panel = function(t) {
 	var i = {
 		_init: function(i) {
 			i = i || {}, this.x = i.x, this.y = i.y, this.scene = i.scene, this.map = i.main_map;
@@ -1046,7 +1062,7 @@ _TD.a.push(function(t) {
 			i.textAlign = "right", i.fillStyle = "#666", i.font = "normal " + 12 * _TD.retina + "px 'Courier New'", i.beginPath(), i.fillText("version: " + t.version + " | " + "t" + "a" + "f" + "a" + "n" + "g." + "or" + "g." + "cn", t.stage.width - t.padding, t.stage.height - 2 * t.padding), i.closePath(), i.textAlign = "left", i.fillStyle = "#666", i.font = "normal " + 12 * _TD.retina + "px 'Courier New'", i.beginPath(), i.fillText("FPS: " + t.fps, t.padding, t.stage.height - 2 * t.padding), i.closePath()
 		}
 	};
-	t.Panel = function(e, s) {
+	t.Panel = function(e, s) {  // 仪表板
 		var n = new t.Element(e, s);
 		return t.lang.mix(n, i), n._init(s), n
 	};
@@ -1073,7 +1089,7 @@ _TD.a.push(function(t) {
 			}
 		}
 	};
-	t.BalloonTip = function(i, s) {
+	t.BalloonTip = function(i, s) { // 气球提示
 		var n = new t.Element(i, s);
 		return t.lang.mix(n, e), n._init(s), n
 	};
@@ -1107,14 +1123,15 @@ _TD.a.push(function(t) {
 			i.textAlign = "center", i.textBaseline = "middle", i.fillStyle = "#ccc", i.font = "bold 62px 'Verdana'", i.beginPath(), i.fillText("GAME OVER", this.width / 2, this.height / 2), i.closePath(), i.fillStyle = "#f00", i.font = "bold 60px 'Verdana'", i.beginPath(), i.fillText("GAME OVER", this.width / 2, this.height / 2), i.closePath()
 		}
 	};
-	t.GameOver = function(i, e) {
+	t.GameOver = function(i, e) { // 游戏结束
 		var s = new t.Element(i, e);
 		return t.lang.mix(s, n), s._init(e), s
 	}, t.recover = function(i) {
 		t.life_recover = i, t.log("life recover: " + i)
 	}
-});
- _TD.a.push(function(t) {
+}
+// 12. 获取初试配置 getDefaultStageData
+let StageData = function(t) {
 	var i = function() {
 			var i = new t.Act(this, "act-1"),
 				e = new t.Scene(i, "scene-1"),
@@ -1148,7 +1165,7 @@ _TD.a.push(function(t) {
 				})
 			}
 		};
-	t.getDefaultStageData = function(s) {
+	t.getDefaultStageData = function(s) { 
 		var n = {
 			stage_main: {
 				width: 640 * _TD.retina,
@@ -1277,72 +1294,74 @@ _TD.a.push(function(t) {
 		};
 		return n[s] || {}
 	}
-});
- _TD.a.push(function(t) {
-	t.default_upgrade_rule = function(t, i) {
-		return 1.2 * i
-	}, t.getDefaultBuildingAttributes = function(t) {
+} 
+// 13.升级规则 默认建筑属性 rule BuildingAttributes 
+let rule = function(t) {
+  t.default_upgrade_rule = function(t, i) {
+    return 1.2 * i
+  }, t.getDefaultBuildingAttributes = function(t) {
     // 获取默认建筑属性
-		var i = {
-			wall: {  // 墙
-				damage: 0,
-				range: 0,
-				speed: 0,
-				bullet_speed: 0,
-				life: 100,
-				shield: 500,
-				cost: 5
-			},
-			cannon: { // 小型炮
-				damage: 12,   // 伤害
-				range: 4,     // 范围
-				max_range: 8, // 最大范围
-				speed: 2,     // 速度
-				bullet_speed: 6,// 子弹速度
-				life: 100,      // 生命
-				shield: 100,    // 防御
-				cost: 300,      // 价值
-				_upgrade_rule_damage: function(t, i) {  // 伤害升级规则
-					return i * (10 >= t ? 1.2 : 1.3)
-				}
-			},
-			LMG: {  // 轻机枪
-				damage: 5,
-				range: 5,
-				max_range: 10,
-				speed: 3,
-				bullet_speed: 6,
-				life: 100,
-				shield: 50,
-				cost: 100
-			},
-			HMG: {   // 大炮
-				damage: 50,
-				range: 4,
-				max_range: 10,
-				speed: 5,
-				bullet_speed: 10,
-				life: 100,
-				shield: 200,
-				cost: 800,
-				_upgrade_rule_damage: function(t, i) {
-					return 1.3 * i
-				}
-			},
-			laser_gun: { // 激光
-				damage: 99999,
-				range: 20,
-				max_range: 30,
-				speed: 300,
-				life: 100,
-				shield: 100,
-				cost: 2e3
-			}
-		};
-		return i[t] || {}
-	}
-});
- _TD.a.push(function(t) {
+    var i = {
+      wall: {  // 墙
+        damage: 0,
+        range: 0,
+        speed: 0,
+        bullet_speed: 0,
+        life: 100,
+        shield: 500,
+        cost: 5
+      },
+      cannon: { // 小型炮
+        damage: 12,   // 伤害
+        range: 4,     // 范围
+        max_range: 8, // 最大范围
+        speed: 2,     // 速度
+        bullet_speed: 6,// 子弹速度
+        life: 100,      // 生命
+        shield: 100,    // 防御
+        cost: 300,      // 价值
+        _upgrade_rule_damage: function(t, i) {  // 伤害升级规则
+          return i * (10 >= t ? 1.2 : 1.3)
+        }
+      },
+      LMG: {  // 轻机枪
+        damage: 5,
+        range: 5,
+        max_range: 10,
+        speed: 3,
+        bullet_speed: 6,
+        life: 100,
+        shield: 50,
+        cost: 100
+      },
+      HMG: {   // 大炮
+        damage: 50,
+        range: 4,
+        max_range: 10,
+        speed: 5,
+        bullet_speed: 10,
+        life: 100,
+        shield: 200,
+        cost: 800,
+        _upgrade_rule_damage: function(t, i) {
+          return 1.3 * i
+        }
+      },
+      laser_gun: { // 激光
+        damage: 99999,
+        range: 20,
+        max_range: 30,
+        speed: 300,
+        life: 100,
+        shield: 100,
+        cost: 2e3
+      }
+    };
+    return i[t] || {}
+  }
+}
+// 14. 渲染怪兽 makeMonsters
+let makeMonsters = function(t) {
 	function i() {
 		if (this.is_valid && this.grid) {
 			var i = t.ctx;
@@ -1353,7 +1372,7 @@ _TD.a.push(function(t) {
 			}
 		}
   }
-  // 获取怪兽默认属性
+  // 获取怪兽默认属性 生成怪兽
 	t.getDefaultMonsterAttributes = function(e) {
 		var s = [{
 			name: "monster 1",
@@ -1441,8 +1460,9 @@ _TD.a.push(function(t) {
 		for (; i > r;) h = i - r, n = Math.min(Math.floor(Math.random() * h) + 1, 3), a = Math.floor(Math.random() * c), l.push([n, e[a]]), r += n;
 		return l
 	}
-});
- _TD.a.push(function(t) {
+}
+// 15 渲染建筑 炮 renderBuilding
+let renderBuilding = function(t) {
 	function i(t, i, e, s, n, h) {
 		var a, l, r, c, o, _, d, u, g;
 		if (i == s) a = i, l = n > e ? e + h : e - h;
@@ -1480,8 +1500,9 @@ _TD.a.push(function(t) {
 			a = t.grid_size / 2;
 		(e[i.type] || e.wall)(i, s, n, h, a)
 	}
-});
- _TD.a.push(function(t) {
+}
+// 16. 信息文本 _msg_texts translate
+let texts = function(t) {
 	t._msg_texts = {
 		_cant_build: "不能在这儿修建",
 		_cant_pass: "怪物不能通过这儿",
@@ -1530,8 +1551,9 @@ _TD.a.push(function(t) {
 		for (e = 0; n > e; e++) s = s.replace("${" + e + "}", i[e]);
 		return s
 	}
-});
- _TD.a.push(function(t) {
+}
+// 17. 找路 FindWay
+let FindWay = function(t) {
 	t.FindWay = function(t, i, e, s, n, h, a) {
 		this.m = [], this.w = t, this.h = i, this.x1 = e, this.y1 = s, this.x2 = n, this.y2 = h, this.way = [], this.len = this.w * this.h, this.is_blocked = this.is_arrived = !1, this.fPassable = "function" == typeof a ? a : function() {
 			return !0
@@ -1558,13 +1580,13 @@ _TD.a.push(function(t) {
 			var e = [];
 			return i > 0 && e.push([t, i - 1]), t < this.w - 1 && e.push([t + 1, i]), i < this.h - 1 && e.push([t, i + 1]), t > 0 && e.push([t - 1, i]), e
 		},
-		getAllNeighbors: function() {
+		getAllNeighbors: function() { // 获取全部相邻的
 			var t, i, e, s = [],
 				n = this.current.length;
 			for (i = 0; n > i; i++) e = this.current[i], t = this.getNeighborsOf(e[0], e[1]), s = s.concat(t);
 			return s
 		},
-		findWay: function() {
+		findWay: function() { // 找路线
 			for (var t, i, e, s, n, h, a, l = this.x2, r = this.y2, c = this.len, o = -1;
 			(l != this.x1 || r != this.y1) && 0 != o && this.way.length < c;) {
 				for (this.way.unshift([l, r]), e = this.getNeighborsOf(l, r), i = e.length, a = [], o = -1, s = 0; i > s; s++) h = this.getVal(e[s][0], e[s][1]), 0 > h || (0 > o || o > h) && (o = h);
@@ -1572,10 +1594,10 @@ _TD.a.push(function(t) {
 				n = a.length, s = n > 1 ? Math.floor(Math.random() * n) : 0, t = a[s], l = t[0], r = t[1]
 			}
 		},
-		arrive: function() {
+		arrive: function() { // 到达
 			this.current = [], this.is_arrived = !0, this.findWay()
 		},
-		blocked: function() {
+		blocked: function() { // 阻塞
 			this.current = [], this.is_blocked = !0
 		},
 		next: function() {
@@ -1586,6 +1608,28 @@ _TD.a.push(function(t) {
 			return 0 == l.length ? (this.blocked(), !1) : (this.current = l, !0)
 		}
 	}
-});
+}
 
-//# sourceMappingURL=td-pkg-zh-min.js.map
+/*
+  事件数组
+*/ 
+let arr = [
+  lang, 
+  eventManager,
+  Stage,
+  Act,
+  Scene,
+  Element,
+  Map,
+  Grid,
+  Building,
+  Explode,
+  Panel,
+  StageData,
+  rule,
+  makeMonsters,
+  renderBuilding,
+  texts,
+  FindWay,
+]
+_TD.a.push(...arr)
