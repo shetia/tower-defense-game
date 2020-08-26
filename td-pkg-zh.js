@@ -4,9 +4,9 @@ let _TD = {
 	init: function(t, i) {  // 初始化
 		delete this.init
 		let s = {
-			version: "0.1.18",
-			is_debug: !! i,
-			is_paused: !0,
+			version: "0.1.18", // 版本
+			is_debug: !! i,  // 是否debug
+			is_paused: !0,  // 是否暂停 
 			width: 16,
 			height: 16,
 			show_monster_life: !0, // 显示怪兽生命力
@@ -152,7 +152,7 @@ let lang = function(t) {
 		},
 		strLeft: function(t, i) {
 			var e = t.slice(0, i),
-				s = e.replace(/[^-ÿ]/g, "**").length;
+				  s = e.replace(/[^-ÿ]/g, "**").length;
 			if (i >= s) return e;
 			switch (s -= e.length) {
 			case 0:
@@ -161,8 +161,8 @@ let lang = function(t) {
 				return t.slice(0, i >> 1);
 			default:
 				var n = i - s,
-					h = t.slice(n, i),
-					a = h.replace(/[-ÿ]/g, "").length;
+            h = t.slice(n, i),
+            a = h.replace(/[-ÿ]/g, "").length;
 				return a ? t.slice(0, n) + this.arguments.callee(h, a) : t.slice(0, n)
 			}
 		},
@@ -174,53 +174,66 @@ let lang = function(t) {
 			else for (var e = 0, s = t.length; s > e; e++) i(t[e])
 		},
 		any: function(t, i) {
-			for (var e = 0, s = t.length; s > e; e++) if (i(t[e])) return t[e];
+			for (var e = 0, s = t.length; s > e; e++){
+        if (i(t[e])) return t[e];
+      }
 			return null
 		},
-		shift: function(t, i) {
-			for (; t[0];) i(t.shift())
+		shift: function(t, i) { // 删除
+      while (t[0]) {
+        i(t.shift())
+      }
 		},
-		rndSort: function(t) {
+		rndSort: function(t) { // 随机排序
 			var i = t.concat();
 			return i.sort(function() {
-				return Math.random() - .5
+				return Math.random() - 0.5
 			})
 		},
-		_rndRGB2: function(t) {
+		_rndRGB2: function(t) { 
 			var i = t.toString(16);
-			return 2 == i.length ? i : "0" + i
+			return 2 == i.length ? i : "0" + i // 小于两位的补0
 		},
-		rndRGB: function() {
+		rndRGB: function() { // 随机16进制颜色 
 			var t = Math.floor(256 * Math.random()),
-				i = Math.floor(256 * Math.random()),
-				e = Math.floor(256 * Math.random());
+          i = Math.floor(256 * Math.random()),
+          e = Math.floor(256 * Math.random());
 			return "#" + this._rndRGB2(t) + this._rndRGB2(i) + this._rndRGB2(e)
 		},
 		rgb2Arr: function(t) {
 			if (7 != t.length) return [0, 0, 0];
 			var i = t.substr(1, 2),
-				e = t.substr(3, 2),
-				s = t.substr(3, 2);
+          e = t.substr(3, 2),
+          s = t.substr(3, 2);
 			return [parseInt(i, 16), parseInt(e, 16), parseInt(s, 16)]
 		},
-		rndStr: function(t) {
+		rndStr: function(t) { // 随机字符串
 			t = t || 16;
 			var i, e, s = "1234567890abcdefghijklmnopqrstuvwxyz",
-				n = [],
-				h = s.length;
-			for (i = 0; t > i; i++) e = Math.floor(Math.random() * h), n.push(s.substr(e, 1));
+          n = [],
+          h = s.length;
+			for (i = 0; t > i; i++){
+        e = Math.floor(Math.random() * h);
+        n.push(s.substr(e, 1));
+      }
 			return n.join("")
 		},
-		nullFunc: function() {},
-		arrayEqual: function(t, i) {
-			var e, s = t.length;
-			if (s != i.length) return !1;
-			for (e = 0; s > e; e++) if (t[e] != i[e]) return !1;
-			return !0
+		nullFunc: function() {},  // 空函数
+		arrayEqual: function(t, i) { // 数组相等 传入两个数组
+			let s = t.length;
+			if (s != i.length) return false  // 数组长度不相等直接返回false
+			for (let e = 0; s > e; e++){
+        if (t[e] != i[e]) return false
+      }
+			return false
 		},
-		mix: function(t, i, e) {
+		mix: function(t, i, e) { // 混合
 			if (!i || !t) return t;
-			for (var s in i)!i.hasOwnProperty(s) || e === !1 && s in t || (t[s] = i[s]);
+			for (let s in i) {
+        if(i.hasOwnProperty(s) && !(e === false && s in t) ){
+          t[s] = i[s]
+        }
+      }
 			return t
 		}
 	}
@@ -977,7 +990,7 @@ let Explode = function(t) {
 		return t.lang.mix(n, e), n._init(s), n
 	}
 }
-// 11各种鼠标事件方法 Panel
+// 11 各种鼠标事件方法 Panel
 let Panel = function(t) {
 	var i = {
 		_init: function(i) {
@@ -1179,11 +1192,11 @@ let StageData = function(t) {
 					grid_y: 16,
 					x: t.padding,
 					y: t.padding,
-					entrance: [0, 0],
-					exit: [15, 15],
+					entrance: [0, 0], // 入口
+					exit: [15, 15],   // 出口
 					grids_cfg: [{
 						pos: [3, 3],
-						passable_flag: 0
+						passable_flag: 0 // 可通行
 					}, {
 						pos: [7, 15],
 						build_flag: 0
@@ -1284,11 +1297,14 @@ let StageData = function(t) {
 				newWave: function(i) {
 					i = i || {};
 					var e = i.map,
-						s = i.wave || 1,
-						n = t.wave_damage || 0;
-					1 == s || (0 == n ? 5 > s ? t.difficulty *= 1.05 : t.difficulty > 30 ? t.difficulty *= 1.1 : t.difficulty *= 1.2 : t.wave_damage >= 50 ? t.difficulty *= .6 : t.wave_damage >= 30 ? t.difficulty *= .7 : t.wave_damage >= 20 ? t.difficulty *= .8 : t.wave_damage >= 10 ? t.difficulty *= .9 : s >= 10 && (t.difficulty *= 1.05)), t.difficulty < 1 && (t.difficulty = 1), t.log("wave " + s + ", last wave damage = " + n + ", difficulty = " + t.difficulty);
+              s = i.wave || 1,
+              n = t.wave_damage || 0;
+          1 == s || (0 == n ? 5 > s ? t.difficulty *= 1.05 : t.difficulty > 30 ? t.difficulty *= 1.1 : t.difficulty *= 1.2 : t.wave_damage >= 50 ? t.difficulty *= 0.6 : t.wave_damage >= 30 ? t.difficulty *= 0.7 : t.wave_damage >= 20 ? t.difficulty *= .8 : t.wave_damage >= 10 ? t.difficulty *= 0.9 : s >= 10 && (t.difficulty *= 1.05))
+          t.difficulty < 1 && (t.difficulty = 1);
+          t.log("wave " + s + ", last wave damage = " + n + ", difficulty = " + t.difficulty);
 					var h = this.config.waves[s] || t.makeMonsters(Math.min(Math.floor(Math.pow(s, 1.1)), this.config.max_monsters_per_wave));
-					e.addMonsters2(h), t.wave_damage = 0
+          e.addMonsters2(h)
+          t.wave_damage = 0
 				}
 			}
 		};
@@ -1365,14 +1381,30 @@ let makeMonsters = function(t) {
 	function i() {
 		if (this.is_valid && this.grid) {
 			var i = t.ctx;
-			if (i.strokeStyle = "#000", i.lineWidth = 1, i.fillStyle = this.color, i.beginPath(), i.arc(this.cx, this.cy, this.r, 0, 2 * Math.PI, !0), i.closePath(), i.fill(), i.stroke(), t.show_monster_life) {
+      if (i.strokeStyle = "#000", 
+          i.lineWidth = 1, 
+          i.fillStyle = this.color, 
+          i.beginPath(), 
+          i.arc(this.cx, this.cy, this.r, 0, 2 * Math.PI, !0), 
+          i.closePath(), 
+          i.fill(), 
+          i.stroke(), 
+          t.show_monster_life
+      ) {
 				var e = Math.floor(t.grid_size / 4),
-					s = 2 * e - 2 * _TD.retina;
-				i.fillStyle = "#000", i.beginPath(), i.fillRect(this.cx - e, this.cy - this.r - 6, 2 * e, 4 * _TD.retina), i.closePath(), i.fillStyle = "#f00", i.beginPath(), i.fillRect(this.cx - e + _TD.retina, this.cy - this.r - (6 - _TD.retina), this.life * s / this.life0, 2 * _TD.retina), i.closePath()
+            s = 2 * e - 2 * _TD.retina;
+        i.fillStyle = "#000", 
+        i.beginPath(), 
+        i.fillRect(this.cx - e, this.cy - this.r - 6, 2 * e, 4 * _TD.retina),
+        i.closePath(),
+        i.fillStyle = "#f00",
+        i.beginPath(),
+        i.fillRect(this.cx - e + _TD.retina, this.cy - this.r - (6 - _TD.retina), this.life * s / this.life0, 2 * _TD.retina), 
+        i.closePath()
 			}
 		}
   }
-  // 获取怪兽默认属性 生成怪兽
+  // 获取怪兽默认属性
 	t.getDefaultMonsterAttributes = function(e) {
 		var s = [{
 			name: "monster 1",
@@ -1452,12 +1484,20 @@ let makeMonsters = function(t) {
 		var n = s[e] || s[0],
 			h = {};
 		return t.lang.mix(h, n), h.render || (h.render = i), h
-	}, t.makeMonsters = function(i, e) {
+  }
+  // 生成怪兽
+  t.makeMonsters = function(i, e) {
 		var s, n, h, a, l = [],
-			r = 0,
-			c = t.monster_type_count;
+        r = 0,
+        c = t.monster_type_count;
 		if (!e) for (e = [], s = 0; c > s; s++) e.push(s);
-		for (; i > r;) h = i - r, n = Math.min(Math.floor(Math.random() * h) + 1, 3), a = Math.floor(Math.random() * c), l.push([n, e[a]]), r += n;
+    while (i > r) {
+      h = i - r
+      n = Math.min(Math.floor(Math.random() * h) + 1, 3)
+      a = Math.floor(Math.random() * c)
+      l.push([n, e[a]])
+      r += n;
+    }
 		return l
 	}
 }
@@ -1489,20 +1529,53 @@ let renderBuilding = function(t) {
 		wall: function(t, i, e, s, n) {
 			i.lineWidth = _TD.retina, i.fillStyle = "#666", i.strokeStyle = "#000", i.fillRect(t.cx - n + 1, t.cy - n + 1, s - 1, s - 1), i.beginPath(), i.moveTo(t.cx - n + .5, t.cy - n + .5), i.lineTo(t.cx - n + .5, t.cy + n + .5), i.lineTo(t.cx + n + .5, t.cy + n + .5), i.lineTo(t.cx + n + .5, t.cy - n + .5), i.lineTo(t.cx - n + .5, t.cy - n + .5), i.moveTo(t.cx - n + .5, t.cy + n + .5), i.lineTo(t.cx + n + .5, t.cy - n + .5), i.moveTo(t.cx - n + .5, t.cy - n + .5), i.lineTo(t.cx + n + .5, t.cy + n + .5), i.closePath(), i.stroke()
 		},
-		laser_gun: function(t, i) {
-			i.fillStyle = "#f00", i.strokeStyle = "#000", i.beginPath(), i.lineWidth = _TD.retina, i.moveTo(t.cx, t.cy - 10 * _TD.retina), i.lineTo(t.cx - 8.66 * _TD.retina, t.cy + 5 * _TD.retina), i.lineTo(t.cx + 8.66 * _TD.retina, t.cy + 5 * _TD.retina), i.lineTo(t.cx, t.cy - 10 * _TD.retina), i.closePath(), i.fill(), i.stroke(), i.fillStyle = "#60f", i.beginPath(), i.arc(t.cx, t.cy, 7 * _TD.retina, 0, 2 * Math.PI, !0), i.closePath(), i.fill(), i.stroke(), i.fillStyle = "#000", i.beginPath(), i.arc(t.cx, t.cy, 3 * _TD.retina, 0, 2 * Math.PI, !0), i.closePath(), i.fill(), i.fillStyle = "#666", i.beginPath(), i.arc(t.cx + 1, t.cy - 1, _TD.retina, 0, 2 * Math.PI, !0), i.closePath(), i.fill(), i.lineWidth = 3 * _TD.retina, i.beginPath(), i.moveTo(t.cx, t.cy), i.closePath(), i.fill(), i.stroke()
+		laser_gun: function(t, i) {  // 激光
+      i.fillStyle = "#f0f", 
+      i.strokeStyle = "#000",
+      i.beginPath(),
+      i.lineWidth = _TD.retina,
+      i.moveTo(t.cx, t.cy - 10 * _TD.retina), 
+      i.lineTo(t.cx - 8.66 * _TD.retina, t.cy + 5 * _TD.retina), 
+      i.lineTo(t.cx + 8.66 * _TD.retina, t.cy + 5 * _TD.retina), 
+      i.lineTo(t.cx, t.cy - 10 * _TD.retina), 
+      i.closePath(), 
+      i.fill(), 
+      i.stroke(), 
+      i.fillStyle = "#60f", 
+      i.beginPath(), 
+      i.arc(t.cx, t.cy, 7 * _TD.retina, 0, 2 * Math.PI, !0), 
+      i.closePath(), 
+      i.fill(), 
+      i.stroke(), 
+      i.fillStyle = "#000", 
+      i.beginPath(), 
+      i.arc(t.cx, t.cy, 3 * _TD.retina, 0, 2 * Math.PI, !0), 
+      i.closePath(), 
+      i.fill(), 
+      i.fillStyle = "#666", 
+      i.beginPath(), 
+      i.arc(t.cx + 1, t.cy - 1, _TD.retina, 0, 2 * Math.PI, !0),
+      i.closePath(), 
+      i.fill(),
+      i.lineWidth = 3 * _TD.retina, 
+      i.beginPath(), 
+      i.moveTo(t.cx, t.cy),
+      i.closePath(), 
+      i.fill(), 
+      i.stroke()
 		}
 	};
 	t.renderBuilding = function(i) {
 		var s = t.ctx,
-			n = i.map,
-			h = t.grid_size,
-			a = t.grid_size / 2;
+        n = i.map,
+        h = t.grid_size,
+        a = t.grid_size / 2;
 		(e[i.type] || e.wall)(i, s, n, h, a)
 	}
 }
 // 16. 信息文本 _msg_texts translate
 let texts = function(t) {
+  // 文本对象
 	t._msg_texts = {
 		_cant_build: "不能在这儿修建",
 		_cant_pass: "怪物不能通过这儿",
@@ -1544,21 +1617,36 @@ let texts = function(t) {
 		monster_be_blocked: "不能在这儿修建建筑，有怪物被围起来了！",
 		entrance_or_exit_be_blocked: "不能在起点或终点处修建建筑！",
 		_: "ERROR"
-	}, t._t = t.translate = function(t, i) {
-		i = "object" == typeof i && i.constructor == Array ? i : [];
-		var e, s = this._msg_texts[t] || this._msg_texts._,
-			n = i.length;
-		for (e = 0; n > e; e++) s = s.replace("${" + e + "}", i[e]);
-		return s
+  }
+  // 转化为文本
+  t._t = t.translate = function(t, arr) {
+    // 判断arr是否为数组
+		arr = ("object" == typeof arr) && (arr.constructor == Array) ? arr : [];
+		var str = this._msg_texts[t] || this._msg_texts._,
+        n = arr.length;
+		for (let i = 0; i < n; i++) {
+      str = str.replace("${" + i + "}", arr[i]);
+    }
+		return str
 	}
 }
 // 17. 找路 FindWay
 let FindWay = function(t) {
 	t.FindWay = function(t, i, e, s, n, h, a) {
-		this.m = [], this.w = t, this.h = i, this.x1 = e, this.y1 = s, this.x2 = n, this.y2 = h, this.way = [], this.len = this.w * this.h, this.is_blocked = this.is_arrived = !1, this.fPassable = "function" == typeof a ? a : function() {
-			return !0
-		}, this._init()
-	}, t.FindWay.prototype = {
+    this.m = []
+    this.w = t
+    this.h = i
+    this.x1 = e
+    this.y1 = s
+    this.x2 = n
+    this.y2 = h
+    this.way = []
+    this.len = this.w * this.h
+    this.is_blocked = this.is_arrived = !1
+    this.fPassable = typeof a === "function" ? a : () => true  // 可通行
+    this._init()
+  }
+  t.FindWay.prototype = {
 		_init: function() {
 			if (this.x1 == this.x2 && this.y1 == this.y2) return this.is_arrived = !0, void(this.way = [
 				[this.x1, this.y1]
@@ -1600,7 +1688,7 @@ let FindWay = function(t) {
 		blocked: function() { // 阻塞
 			this.current = [], this.is_blocked = !0
 		},
-		next: function() {
+		next: function() { 
 			var t, i, e, s, n, h = this.getAllNeighbors(),
 				a = h.length,
 				l = [];
