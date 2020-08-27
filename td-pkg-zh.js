@@ -6,7 +6,7 @@ let _TD = {
 		let s = {
 			version: "0.1.18", // 版本
 			is_debug: !! i,  // 是否debug
-			is_paused: !0,  // 是否暂停 
+			is_paused: !0,  // 是否暂停
 			width: 16,
 			height: 16,
 			show_monster_life: !0, // 显示怪兽生命力
@@ -190,11 +190,11 @@ let lang = function(t) {
 				return Math.random() - 0.5
 			})
 		},
-		_rndRGB2: function(t) { 
+		_rndRGB2: function(t) {
 			var i = t.toString(16);
 			return 2 == i.length ? i : "0" + i // 小于两位的补0
 		},
-		rndRGB: function() { // 随机16进制颜色 
+		rndRGB: function() { // 随机16进制颜色
 			var t = Math.floor(256 * Math.random()),
           i = Math.floor(256 * Math.random()),
           e = Math.floor(256 * Math.random());
@@ -722,18 +722,36 @@ let Grid = function(t) {
 let Building = function(t) {
 	var i = {
 		_init: function(i) {
-			this.is_selected = !1, this.level = 0, this.killed = 0, this.target = null, i = i || {}, this.map = i.map || null, this.grid = i.grid || null, this.bullet_type = i.bullet_type || 1, this.type = i.type, this.speed = i.speed, this.bullet_speed = i.bullet_speed, this.is_pre_building = !! i.is_pre_building, this.blink = this.is_pre_building, this.wait_blink = this._default_wait_blink = 20, this.is_weapon = "wall" != this.type;
+			this.is_selected = false
+			this.level = 0
+			this.killed = 0
+			this.target = null
+			i = i || {}
+			this.map = i.map || null
+			this.grid = i.grid || null
+			this.bullet_type = i.bullet_type || 1
+			this.type = i.type
+			this.speed = i.speed
+			this.bullet_speed = i.bullet_speed
+			this.is_pre_building = !! i.is_pre_building
+			this.blink = this.is_pre_building
+			this.wait_blink = this._default_wait_blink = 20
+			this.is_weapon = "wall" != this.type;
 			var e = t.getDefaultBuildingAttributes(this.type);
-			t.lang.mix(this, e), this.range_px = this.range * t.grid_size, this.money = this.cost, this.caculatePos()
+			t.lang.mix(this, e)
+			this.range_px = this.range * t.grid_size
+			this.money = this.cost
+			this.caculatePos()
 		},
-		getUpgradeCost: function() {
+		getUpgradeCost: function() { // 获取升级价格
 			return Math.floor(.75 * this.money)
 		},
-		getSellMoney: function() {
+		getSellMoney: function() { // 获取卖出价格
 			return Math.floor(.5 * this.money) || 1
 		},
-		toggleSelected: function() {
-			this.is_selected = !this.is_selected, this.grid.hightLight(this.is_selected);
+		toggleSelected: function() {// 切换选择
+			this.is_selected = !this.is_selected
+			this.grid.hightLight(this.is_selected);
 			var t = this;
 			this.is_selected ? (this.map.eachBuilding(function(i) {
 				i.is_selected = i == t
@@ -741,15 +759,22 @@ let Building = function(t) {
 				t.is_selected = !1, t.grid.hightLight(!1)
 			}), this.map.selected_building = this, this.map.is_main_map ? this.scene.map.cancelPreBuild() : this.scene.map.preBuild(this.type)) : (this.map.selected_building == this && (this.map.selected_building = null), this.map.is_main_map || this.scene.map.cancelPreBuild()), this.map.is_main_map && (this.map.selected_building ? (this.scene.panel.btn_upgrade.show(), this.scene.panel.btn_sell.show(), this.updateBtnDesc()) : (this.scene.panel.btn_upgrade.hide(), this.scene.panel.btn_sell.hide()))
 		},
-		updateBtnDesc: function() {
+		updateBtnDesc: function() { // 升级按钮描述
 			this.scene.panel.btn_upgrade.desc = t._t("upgrade", [t._t("building_name_" + this.type), this.level + 1, this.getUpgradeCost()]), this.scene.panel.btn_sell.desc = t._t("sell", [t._t("building_name_" + this.type), this.getSellMoney()])
 		},
+		// 定位
 		locate: function(i) {
 			this.grid = i, this.map = i.map, this.cx = this.grid.cx, this.cy = this.grid.cy, this.x = this.grid.x, this.y = this.grid.y, this.x2 = this.grid.x2, this.y2 = this.grid.y2, this.width = this.grid.width, this.height = this.grid.height, this.px = this.x + .5, this.py = this.y + .5, this.wait_blink = this._default_wait_blink, this._fire_wait = Math.floor(Math.max(2 / (this.speed * t.global_speed), 1)), this._fire_wait2 = this._fire_wait
 		},
+		// 删除
 		remove: function() {
-			this.grid && this.grid.building && this.grid.building == this && (this.grid.building = null), this.hide(), this.del()
+			if (this.grid && this.grid.building && this.grid.building == this) {
+				this.grid.building = null
+				this.hide()
+				this.del()
+			}
 		},
+		// 查找目标
 		findTaget: function() {
 			if (this.is_weapon && !this.is_pre_building && this.grid) {
 				var i = this.cx,
@@ -760,6 +785,7 @@ let Building = function(t) {
 				}))
 			}
 		},
+		// 获取目标位置
 		getTargetPosition: function() {
 			if (!this.target) {
 				var t = this.map.is_main_map ? this.map.entrance : this.grid;
@@ -767,7 +793,7 @@ let Building = function(t) {
 			}
 			return [this.target.cx, this.target.cy]
 		},
-		fire: function() {
+		fire: function() { // 开火
 			if (this.target && this.target.is_valid) {
 				if ("laser_gun" == this.type) return void this.target.beHit(this, this.damage);
 				var i = this.muzzle || [this.cx, this.cy],
@@ -783,6 +809,7 @@ let Building = function(t) {
 				})
 			}
 		},
+		// 尝试开火
 		tryToFire: function() {
 			this.is_weapon && this.target && (this._fire_wait--, this._fire_wait > 0 || (this._fire_wait < 0 ? this._fire_wait = this._fire_wait2 : this.fire()))
 		},
@@ -794,6 +821,7 @@ let Building = function(t) {
 				h = this[n] || t.default_upgrade_rule;
 			e && !isNaN(e) && (e = h(this.level, e), this[s] && !isNaN(this[s]) && this[s] < e && (e = this[s]), this._upgrade_records[i] = e, this[i] = Math.floor(e))
 		},
+		// 升级
 		upgrade: function() {
 			this._upgrade_records || (this._upgrade_records = {});
 			var i, e = ["damage", "range", "speed", "life", "shield"],
@@ -801,21 +829,56 @@ let Building = function(t) {
 			for (i = 0; s > i; i++) this._upgrade2(e[i]);
 			this.level++, this.range_px = this.range * t.grid_size
 		},
+		// 尝试升级
 		tryToUpgrade: function(i) {
 			var e = this.getUpgradeCost(),
 				s = "";
 			e > t.money ? s = t._t("not_enough_money", [e]) : (t.money -= e, this.money += e, this.upgrade(), s = t._t("upgrade_success", [t._t("building_name_" + this.type), this.level, this.getUpgradeCost()])), this.updateBtnDesc(), this.scene.panel.balloontip.msg(s, i)
 		},
+		// 尝试卖出
 		tryToSell: function() {
 			this.is_valid && (t.money += this.getSellMoney(), this.grid.removeBuilding(), this.is_valid = !1, this.map.selected_building = null, this.map.select_hl.hide(), this.map.checkHasWeapon(), this.scene.panel.btn_upgrade.hide(), this.scene.panel.btn_sell.hide(), this.scene.panel.balloontip.hide())
 		},
 		step: function() {
-			this.blink && (this.wait_blink--, this.wait_blink < -this._default_wait_blink && (this.wait_blink = this._default_wait_blink)), this.findTaget(), this.tryToFire()
+			this.blink && (this.wait_blink--, this.wait_blink < -this._default_wait_blink && (this.wait_blink = this._default_wait_blink))
+			this.findTaget()
+			this.tryToFire()
 		},
+		// 渲染
 		render: function() {
 			if (this.is_visiable && !(this.wait_blink < 0)) {
 				var i = t.ctx;
-				t.renderBuilding(this), this.map.is_main_map && (this.is_selected || this.is_pre_building || this.map.show_all_ranges) && this.is_weapon && this.range > 0 && this.grid && (i.lineWidth = _TD.retina, i.fillStyle = "rgba(187, 141, 32, 0.15)", i.strokeStyle = "#bb8d20", i.beginPath(), i.arc(this.cx, this.cy, this.range_px, 0, 2 * Math.PI, !0), i.closePath(), i.fill(), i.stroke()), "laser_gun" == this.type && this.target && this.target.is_valid && (i.lineWidth = 3 * _TD.retina, i.strokeStyle = "rgba(50, 50, 200, 0.5)", i.beginPath(), i.moveTo(this.cx, this.cy), i.lineTo(this.target.cx, this.target.cy), i.closePath(), i.stroke(), i.lineWidth = _TD.retina, i.strokeStyle = "rgba(150, 150, 255, 0.5)", i.beginPath(), i.lineTo(this.cx, this.cy), i.closePath(), i.stroke())
+				t.renderBuilding(this)
+				if (this.map.is_main_map &&
+						(this.is_selected || this.is_pre_building || this.map.show_all_ranges) && this.is_weapon &&
+						this.range > 0 &&
+						this.grid)
+				{
+					i.lineWidth = _TD.retina
+					i.fillStyle = "rgba(187, 141, 132, 0.15)" // 范围阴影颜色
+					i.strokeStyle = "#f00" // 范围外圈颜色
+					i.beginPath()
+					i.arc(this.cx, this.cy, this.range_px, 0, 2 * Math.PI, !0)
+					i.closePath()
+					i.fill()
+					i.stroke()
+				}
+				// 激光炮 弹颜色
+				if( this.type === "laser_gun" && this.target && this.target.is_valid){
+					i.lineWidth = 3 * _TD.retina
+					i.strokeStyle = "rgba(250, 0, 0, 0.5)" // 激光颜色
+					i.beginPath()
+					i.moveTo(this.cx, this.cy)
+					i.lineTo(this.target.cx, this.target.cy)
+					i.closePath()
+					i.stroke()
+					i.lineWidth = _TD.retina
+					i.strokeStyle = "rgba(150, 150, 255, 0.5)"
+					i.beginPath()
+					i.lineTo(this.cx, this.cy)
+					i.closePath()
+					i.stroke()
+				}
 			}
 		},
 		onEnter: function() {
@@ -874,6 +937,7 @@ let Building = function(t) {
 			i.fillStyle = this.color, i.beginPath(), i.arc(this.cx, this.cy, this.r, 0, 2 * Math.PI, !0), i.closePath(), i.fill()
 		}
 	};
+	// 子弹
 	t.Bullet = function(i, s) {
 		var n = new t.Element(i, s);
 		return t.lang.mix(n, e), n._init(s), n
@@ -1178,7 +1242,7 @@ let StageData = function(t) {
 				})
 			}
 		};
-	t.getDefaultStageData = function(s) { 
+	t.getDefaultStageData = function(s) {
 		var n = {
 			stage_main: {
 				width: 640 * _TD.retina,
@@ -1310,8 +1374,8 @@ let StageData = function(t) {
 		};
 		return n[s] || {}
 	}
-} 
-// 13.升级规则 默认建筑属性 rule BuildingAttributes 
+}
+// 13.升级规则 默认建筑属性 rule BuildingAttributes
 let rule = function(t) {
   t.default_upgrade_rule = function(t, i) {
     return 1.2 * i
@@ -1381,25 +1445,25 @@ let makeMonsters = function(t) {
 	function i() {
 		if (this.is_valid && this.grid) {
 			var i = t.ctx;
-      if (i.strokeStyle = "#000", 
-          i.lineWidth = 1, 
-          i.fillStyle = this.color, 
-          i.beginPath(), 
-          i.arc(this.cx, this.cy, this.r, 0, 2 * Math.PI, !0), 
-          i.closePath(), 
-          i.fill(), 
-          i.stroke(), 
+      if (i.strokeStyle = "#000",
+          i.lineWidth = 1,
+          i.fillStyle = this.color,
+          i.beginPath(),
+          i.arc(this.cx, this.cy, this.r, 0, 2 * Math.PI, !0),
+          i.closePath(),
+          i.fill(),
+          i.stroke(),
           t.show_monster_life
       ) {
 				var e = Math.floor(t.grid_size / 4),
             s = 2 * e - 2 * _TD.retina;
-        i.fillStyle = "#000", 
-        i.beginPath(), 
+        i.fillStyle = "#000",
+        i.beginPath(),
         i.fillRect(this.cx - e, this.cy - this.r - 6, 2 * e, 4 * _TD.retina),
         i.closePath(),
         i.fillStyle = "#f00",
         i.beginPath(),
-        i.fillRect(this.cx - e + _TD.retina, this.cy - this.r - (6 - _TD.retina), this.life * s / this.life0, 2 * _TD.retina), 
+        i.fillRect(this.cx - e + _TD.retina, this.cy - this.r - (6 - _TD.retina), this.life * s / this.life0, 2 * _TD.retina),
         i.closePath()
 			}
 		}
@@ -1505,66 +1569,181 @@ let makeMonsters = function(t) {
 let renderBuilding = function(t) {
 	function i(t, i, e, s, n, h) {
 		var a, l, r, c, o, _, d, u, g;
-		if (i == s) a = i, l = n > e ? e + h : e - h;
-		else if (e == n) l = e, a = s > i ? i + h : i - h;
-		else {
-			if (r = (e - n) / (i - s), c = e - i * r, d = r * r + 1, u = 2 * (r * (c - e) - i), g = Math.pow(c - e, 2) + i * i - Math.pow(h, 2), o = Math.pow(u, 2) - 4 * d * g, 0 > o) return [0, 0];
-			o = Math.sqrt(o), _ = (-u + o) / (2 * d), s - i > 0 && _ - i > 0 || 0 > s - i && 0 > _ - i ? (a = _, l = r * a + c) : (a = (-u - o) / (2 * d), l = r * a + c)
+		if (i == s){
+			a = i
+			l = n > e ? e + h : e - h;
+		} else if (e == n) {
+			l = e
+			a = s > i ? i + h : i - h;
+		} else {
+			r = (e - n) / (i - s)
+			c = e - i * r
+			d = r * r + 1
+			u = 2 * (r * (c - e) - i)
+			g = Math.pow(c - e, 2) + i * i - Math.pow(h, 2)
+			o = Math.pow(u, 2) - 4 * d * g
+			if ( 0 > o ) return [0, 0];
+			o = Math.sqrt(o)
+			_ = (-u + o) / (2 * d)
+			if ( (s - i > 0 && _ - i > 0) || (0 > s - i && 0 > _ - i) ) {
+				a = _
+				 l = r * a + c
+			} else {
+				a = (-u - o) / (2 * d)
+				l = r * a + c
+			}
 		}
 		return t.lineCap = "round", t.moveTo(i, e), t.lineTo(a, l), [a, l]
 	}
 	var e = {
+		// 加农炮 中性炮
 		cannon: function(t, e, s, n, h) {
 			var a = t.getTargetPosition();
-			e.fillStyle = "#393", e.strokeStyle = "#000", e.beginPath(), e.lineWidth = _TD.retina, e.arc(t.cx, t.cy, h - 5, 0, 2 * Math.PI, !0), e.closePath(), e.fill(), e.stroke(), e.lineWidth = 3 * _TD.retina, e.beginPath(), e.moveTo(t.cx, t.cy), t.muzzle = i(e, t.cx, t.cy, a[0], a[1], h), e.closePath(), e.stroke(), e.lineWidth = _TD.retina, e.fillStyle = "#060", e.beginPath(), e.arc(t.cx, t.cy, 7 * _TD.retina, 0, 2 * Math.PI, !0), e.closePath(), e.fill(), e.stroke(), e.fillStyle = "#cec", e.beginPath(), e.arc(t.cx + 2, t.cy - 2, 3 * _TD.retina, 0, 2 * Math.PI, !0), e.closePath(), e.fill()
+			e.fillStyle = "#a93"   // 主体颜色
+			e.strokeStyle = "#a00" // 炮管颜色 边框
+			e.beginPath()
+			e.lineWidth = _TD.retina
+			e.arc(t.cx, t.cy, h - 5, 0, 2 * Math.PI, !0)
+			e.closePath()
+			e.fill()
+			e.stroke()
+			e.lineWidth = 3 * _TD.retina
+			e.beginPath()
+			e.moveTo(t.cx, t.cy), t.muzzle = i(e, t.cx, t.cy, a[0], a[1], h)
+			e.closePath()
+			e.stroke()
+			e.lineWidth = _TD.retina
+			e.fillStyle = "#a60" // 中心圆颜色
+			e.beginPath()
+			e.arc(t.cx, t.cy, 7 * _TD.retina, 0, 2 * Math.PI, !0)
+			e.closePath()
+			e.fill()
+			e.stroke()
+			e.fillStyle = "#1ec" // 内圆颜色
+			e.beginPath()
+			e.arc(t.cx + 2, t.cy - 2, 3 * _TD.retina, 0, 2 * Math.PI, !0)
+			e.closePath()
+			e.fill()
 		},
+		// 轻机枪
 		LMG: function(t, e, s, n, h) {
 			var a = t.getTargetPosition();
-			e.fillStyle = "#36f", e.strokeStyle = "#000", e.beginPath(), e.lineWidth = _TD.retina, e.arc(t.cx, t.cy, 7 * _TD.retina, 0, 2 * Math.PI, !0), e.closePath(), e.fill(), e.stroke(), e.lineWidth = 2 * _TD.retina, e.beginPath(), e.moveTo(t.cx, t.cy), t.muzzle = i(e, t.cx, t.cy, a[0], a[1], h), e.closePath(), e.fill(), e.stroke(), e.lineWidth = _TD.retina, e.fillStyle = "#66c", e.beginPath(), e.arc(t.cx, t.cy, 5 * _TD.retina, 0, 2 * Math.PI, !0), e.closePath(), e.fill(), e.stroke(), e.fillStyle = "#ccf", e.beginPath(), e.arc(t.cx + 1, t.cy - 1, 2 * _TD.retina, 0, 2 * Math.PI, !0), e.closePath(), e.fill()
+			e.fillStyle = "#36f"
+			e.strokeStyle = "#000"
+			e.beginPath()
+			e.lineWidth = _TD.retina
+			e.arc(t.cx, t.cy, 7 * _TD.retina, 0, 2 * Math.PI, !0)
+			e.closePath()
+			e.fill()
+			e.stroke()
+			e.lineWidth = 2 * _TD.retina
+			e.beginPath()
+			e.moveTo(t.cx, t.cy)
+			t.muzzle = i(e, t.cx, t.cy, a[0], a[1], h)
+			e.closePath()
+			e.fill()
+			e.stroke()
+			e.lineWidth = _TD.retina, e.fillStyle = "#66c"
+			e.beginPath()
+			e.arc(t.cx, t.cy, 5 * _TD.retina, 0, 2 * Math.PI, !0)
+			e.closePath()
+			e.fill()
+			e.stroke()
+			e.fillStyle = "#ccf"
+			e.beginPath()
+			e.arc(t.cx + 1, t.cy - 1, 2 * _TD.retina, 0, 2 * Math.PI, !0)
+			e.closePath()
+			e.fill()
 		},
+		// 大炮
 		HMG: function(t, e, s, n, h) {
 			var a = t.getTargetPosition();
-			e.fillStyle = "#933", e.strokeStyle = "#000", e.beginPath(), e.lineWidth = _TD.retina, e.arc(t.cx, t.cy, h - 2, 0, 2 * Math.PI, !0), e.closePath(), e.fill(), e.stroke(), e.lineWidth = 5 * _TD.retina, e.beginPath(), e.moveTo(t.cx, t.cy), t.muzzle = i(e, t.cx, t.cy, a[0], a[1], h), e.closePath(), e.fill(), e.stroke(), e.lineWidth = _TD.retina, e.fillStyle = "#630", e.beginPath(), e.arc(t.cx, t.cy, h - 5 * _TD.retina, 0, 2 * Math.PI, !0), e.closePath(), e.fill(), e.stroke(), e.fillStyle = "#960", e.beginPath(), e.arc(t.cx + 1, t.cy - 1, 8 * _TD.retina, 0, 2 * Math.PI, !0), e.closePath(), e.fill(), e.fillStyle = "#fcc", e.beginPath(), e.arc(t.cx + 3, t.cy - 3, 4 * _TD.retina, 0, 2 * Math.PI, !0), e.closePath(), e.fill()
+			e.fillStyle = "#933"
+			e.strokeStyle = "#000"
+			e.beginPath()
+			e.lineWidth = _TD.retina
+			e.arc(t.cx, t.cy, h - 2, 0, 2 * Math.PI, !0)
+			e.closePath()
+			e.fill()
+			e.stroke()
+			e.lineWidth = 5 * _TD.retina, e.beginPath()
+			e.moveTo(t.cx, t.cy)
+			t.muzzle = i(e, t.cx, t.cy, a[0], a[1], h), e.closePath()
+			e.fill(), e.stroke()
+			e.lineWidth = _TD.retina, e.fillStyle = "#630"
+			e.beginPath()
+			e.arc(t.cx, t.cy, h - 5 * _TD.retina, 0, 2 * Math.PI, !0)
+			e.closePath()
+			e.fill()
+			e.stroke()
+			e.fillStyle = "#960"
+			e.beginPath()
+			e.arc(t.cx + 1, t.cy - 1, 8 * _TD.retina, 0, 2 * Math.PI, !0)
+			e.closePath()
+			e.fill()
+			e.fillStyle = "#fcc"
+			e.beginPath()
+			e.arc(t.cx + 3, t.cy - 3, 4 * _TD.retina, 0, 2 * Math.PI, !0)
+			e.closePath()
+			e.fill()
 		},
+		// 墙
 		wall: function(t, i, e, s, n) {
-			i.lineWidth = _TD.retina, i.fillStyle = "#666", i.strokeStyle = "#000", i.fillRect(t.cx - n + 1, t.cy - n + 1, s - 1, s - 1), i.beginPath(), i.moveTo(t.cx - n + .5, t.cy - n + .5), i.lineTo(t.cx - n + .5, t.cy + n + .5), i.lineTo(t.cx + n + .5, t.cy + n + .5), i.lineTo(t.cx + n + .5, t.cy - n + .5), i.lineTo(t.cx - n + .5, t.cy - n + .5), i.moveTo(t.cx - n + .5, t.cy + n + .5), i.lineTo(t.cx + n + .5, t.cy - n + .5), i.moveTo(t.cx - n + .5, t.cy - n + .5), i.lineTo(t.cx + n + .5, t.cy + n + .5), i.closePath(), i.stroke()
+			i.lineWidth = _TD.retina
+			i.fillStyle = "#a6b"
+			i.strokeStyle = "#eee"
+			i.fillRect(t.cx - n + 1, t.cy - n + 1, s - 1, s - 1)
+			i.beginPath()
+			i.moveTo(t.cx - n + .5, t.cy - n + .5)
+			i.lineTo(t.cx - n + .5, t.cy + n + .5)
+			i.lineTo(t.cx + n + .5, t.cy + n + .5)
+			i.lineTo(t.cx + n + .5, t.cy - n + .5)
+			i.lineTo(t.cx - n + .5, t.cy - n + .5)
+			i.moveTo(t.cx - n + .5, t.cy + n + .5)
+			i.lineTo(t.cx + n + .5, t.cy - n + .5)
+			i.moveTo(t.cx - n + .5, t.cy - n + .5)
+			i.lineTo(t.cx + n + .5, t.cy + n + .5)
+			i.closePath()
+			i.stroke()
 		},
-		laser_gun: function(t, i) {  // 激光
-      i.fillStyle = "#f0f", 
-      i.strokeStyle = "#000",
+		// 激光
+		laser_gun: function(t, i) {
+      i.fillStyle = "#f00",
+      i.strokeStyle = "#300",
       i.beginPath(),
       i.lineWidth = _TD.retina,
-      i.moveTo(t.cx, t.cy - 10 * _TD.retina), 
-      i.lineTo(t.cx - 8.66 * _TD.retina, t.cy + 5 * _TD.retina), 
-      i.lineTo(t.cx + 8.66 * _TD.retina, t.cy + 5 * _TD.retina), 
-      i.lineTo(t.cx, t.cy - 10 * _TD.retina), 
-      i.closePath(), 
-      i.fill(), 
-      i.stroke(), 
-      i.fillStyle = "#60f", 
-      i.beginPath(), 
-      i.arc(t.cx, t.cy, 7 * _TD.retina, 0, 2 * Math.PI, !0), 
-      i.closePath(), 
-      i.fill(), 
-      i.stroke(), 
-      i.fillStyle = "#000", 
-      i.beginPath(), 
-      i.arc(t.cx, t.cy, 3 * _TD.retina, 0, 2 * Math.PI, !0), 
-      i.closePath(), 
-      i.fill(), 
-      i.fillStyle = "#666", 
-      i.beginPath(), 
-      i.arc(t.cx + 1, t.cy - 1, _TD.retina, 0, 2 * Math.PI, !0),
-      i.closePath(), 
+      i.moveTo(t.cx, t.cy - 10 * _TD.retina),
+      i.lineTo(t.cx - 8.66 * _TD.retina, t.cy + 5 * _TD.retina),
+      i.lineTo(t.cx + 8.66 * _TD.retina, t.cy + 5 * _TD.retina),
+      i.lineTo(t.cx, t.cy - 10 * _TD.retina),
+      i.closePath(),
       i.fill(),
-      i.lineWidth = 3 * _TD.retina, 
-      i.beginPath(), 
+      i.stroke(),
+      i.fillStyle = "#60f",// 外圆颜色
+      i.beginPath(),
+      i.arc(t.cx, t.cy, 7 * _TD.retina, 0, 2 * Math.PI, !0),
+      i.closePath(),
+      i.fill(),
+      i.stroke(),
+      i.fillStyle = "#f00", // 中心圆颜色
+      i.beginPath(),
+      i.arc(t.cx, t.cy, 3 * _TD.retina, 0, 2 * Math.PI, !0),
+      i.closePath(),
+      i.fill(),
+      i.fillStyle = "#fff", // 内点颜色
+      i.beginPath(),
+      i.arc(t.cx + 1, t.cy - 1, _TD.retina, 0, 2 * Math.PI, !0),
+      i.closePath(),
+      i.fill(),
+      i.lineWidth = 3 * _TD.retina,
+      i.beginPath(),
       i.moveTo(t.cx, t.cy),
-      i.closePath(), 
-      i.fill(), 
+      i.closePath(),
+      i.fill(),
       i.stroke()
 		}
 	};
+	// 渲染建筑
 	t.renderBuilding = function(i) {
 		var s = t.ctx,
         n = i.map,
@@ -1688,7 +1867,7 @@ let FindWay = function(t) {
 		blocked: function() { // 阻塞
 			this.current = [], this.is_blocked = !0
 		},
-		next: function() { 
+		next: function() {
 			var t, i, e, s, n, h = this.getAllNeighbors(),
 				a = h.length,
 				l = [];
@@ -1700,9 +1879,9 @@ let FindWay = function(t) {
 
 /*
   事件数组
-*/ 
+*/
 let arr = [
-  lang, 
+  lang,
   eventManager,
   Stage,
   Act,
